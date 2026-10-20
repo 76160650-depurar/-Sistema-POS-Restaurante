@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.vscode/
+.pytest_cache/
+.coverage
+htmlcov/
+data/restaurant.json
+.DS_Store
