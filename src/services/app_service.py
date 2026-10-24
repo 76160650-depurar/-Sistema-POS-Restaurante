@@ -137,26 +137,32 @@ class RestaurantService:
         self.data_manager.save(payload)
 
     def load_snapshot(self) -> None:
-        """Recupera el menú, las mesas y los pedidos desde el archivo JSON."""
+        """Recupera los datos y sincroniza el estado de las mesas."""
         payload = self.data_manager.load()
 
         if not payload:
             return
 
+        # Restaurar el menú.
         for item in payload.get("menu", []):
-            dish = Dish(item["name"], item["price"])
-            dish.available = item.get("available", True)
+            dish = Dish(
+                name=item["name"],
+                price=item["price"],
+                available=item.get("available", True),
+            )
             self.menu[dish.name.casefold()] = dish
 
+        # Restaurar las mesas.
         for item in payload.get("tables", []):
             table = RestaurantTable(item["number"])
             table.status = TableStatus(item["status"])
             self.tables[table.number] = table
 
+        # Restaurar los pedidos y sus detalles.
         for item in payload.get("orders", []):
             order = Order(
-                item["order_id"],
-                item["table_number"],
+                order_id=item["order_id"],
+                table_number=item["table_number"],
             )
             order.status = OrderStatus(item["status"])
 
@@ -170,8 +176,28 @@ class RestaurantService:
 
             self.orders[order.order_id] = order
 
+        # Sincronizar el estado de las mesas según los pedidos.
+        for table in self.tables.values():
+            table.status = TableStatus.FREE
+
+        for order in self.orders.values():
+            table = self.tables.get(order.table_number)
+
+            if table is None:
+                raise ValidationError(
+                    f"El pedido {order.order_id} referencia "
+                    f"una mesa inexistente: {order.table_number}."
+                )
+
+            if order.status not in (
+                OrderStatus.DELIVERED,
+                OrderStatus.CANCELLED,
+            ):
+                table.status = TableStatus.OCCUPIED
+
+        # Evitar reutilizar identificadores existentes.
         stored_next_id = payload.get("next_order_id", 1)
         highest_order_id = max(self.orders.keys(), default=0) + 1
 
-        # Evitar reutilizar números de pedidos existentes.
         self._next_order_id = max(stored_next_id, highest_order_id)
+        
