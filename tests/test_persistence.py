@@ -24,7 +24,6 @@ class PersistenceTests(unittest.TestCase):
         service.add_table(2)
 
         service.save_snapshot()
-
         restored = RestaurantService(self.data_manager)
 
         self.assertEqual(len(restored.menu), 2)
@@ -57,6 +56,41 @@ class PersistenceTests(unittest.TestCase):
         self.assertEqual(service.tables, {})
         self.assertEqual(service.orders, {})
         self.assertEqual(service._next_order_id, 1)
+
+    def test_active_order_restores_table_as_occupied(self):
+        service = RestaurantService(self.data_manager)
+        service.add_dish("Lomo saltado", 25.00)
+        service.add_table(1)
+
+        order = service.create_order(1)
+        service.add_item(order.order_id, "Lomo saltado", 1)
+        service.save_snapshot()
+
+        restored = RestaurantService(self.data_manager)
+
+        self.assertEqual(
+            restored.tables[1].status.value,
+            "ocupada",
+        )
+
+    def test_delivered_order_restores_table_as_free(self):
+        service = RestaurantService(self.data_manager)
+        service.add_dish("Lomo saltado", 25.00)
+        service.add_table(1)
+
+        order = service.create_order(1)
+        service.add_item(order.order_id, "Lomo saltado", 1)
+        service.change_order_status(order.order_id, OrderStatus.PREPARING)
+        service.change_order_status(order.order_id, OrderStatus.READY)
+        service.change_order_status(order.order_id, OrderStatus.DELIVERED)
+        service.save_snapshot()
+
+        restored = RestaurantService(self.data_manager)
+
+        self.assertEqual(
+            restored.tables[1].status.value,
+            "libre",
+        )
 
 
 if __name__ == "__main__":
