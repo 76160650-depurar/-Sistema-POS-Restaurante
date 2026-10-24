@@ -1,4 +1,4 @@
-"""Entidades de dominio del Sistema POS para Restaurante."""
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List

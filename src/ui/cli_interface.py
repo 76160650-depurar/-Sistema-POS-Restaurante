@@ -1,4 +1,4 @@
-"""Interfaz de línea de comandos (CLI)."""
+
 from src.domain.models import OrderStatus
 from src.domain.exceptions import RestaurantError
 
