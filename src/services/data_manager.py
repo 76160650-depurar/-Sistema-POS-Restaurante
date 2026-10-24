@@ -1,4 +1,4 @@
-"""Persistencia sencilla en archivo JSON."""
+
 import json
 from pathlib import Path
 from typing import Any

@@ -1,4 +1,4 @@
-"""Punto de entrada de la aplicación."""
+
 from src.services.app_service import RestaurantService
 from src.ui.cli_interface import RestaurantCLI
 
