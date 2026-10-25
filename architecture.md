@@ -74,6 +74,7 @@ classDiagram
 5. Usar JSON como persistencia demostrativa sin dependencias externas.
 
 ## 6. Limitaciones conocidas
-- El archivo JSON guarda una instantánea, pero no restaura automáticamente el estado en memoria al iniciar.
-- No incluye autenticación, pagos reales ni base de datos transaccional.
-- Es una versión académica para demostración, no un sistema listo para producción.
+
+- La persistencia utiliza archivos JSON, por lo que no ofrece las garantías transaccionales de una base de datos.
+- No incluye autenticación de usuarios ni integración con pasarelas de pago reales.
+- El sistema está diseñado con fines académicos y de demostración, no para su uso directo en un entorno de producción.
