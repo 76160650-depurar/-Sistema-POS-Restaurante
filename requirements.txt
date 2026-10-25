@@ -1,1 +1,1 @@
-# Este proyecto usa exclusivamente la biblioteca estándar de Python.\n
+# Este proyecto usa exclusivamente la biblioteca estándar de Python.
